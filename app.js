@@ -18,27 +18,26 @@ addRecordBtn.addEventListener("click", (event) => {
   const isFormValid = checkFormValidation(temperature, date);
   if (isFormValid) {
     submitForm();
-    const temperatureArray = getTemperatureArray();
-    const dateArray = getDateArray();
-    loadWeatherChart(temperatureArray, dateArray);
+    // const temperatureArray = getTemperatureArray();
+    // const dateArray = getDateArray();
+    loadWeatherChart(weather);
   }
 });
 
 // GetMax Button: To get highest temperature
 getMaxBtn.addEventListener("click", (event) => {
   event.preventDefault();
-
-  const sortedTemperatureArray = sortTemperatures();
+  const sortedWeather = sortWeather(weather);
   const highestTemperature =
-    sortedTemperatureArray[sortedTemperatureArray.length - 1];
+    sortedWeather[sortedWeather.length - 1]["temperature"];
   results.textContent = `Higest temperature is: ${highestTemperature}`;
 });
 
 // GetMin Button: To get lowest temperature
 getMinBtn.addEventListener("click", (event) => {
   event.preventDefault();
-  const sortedTemperatureArray = sortTemperatures();
-  const lowestTemperature = sortedTemperatureArray[0];
+  const sortedWeather = sortWeather(weather);
+  const lowestTemperature = sortedWeather[0]["temperature"];
   results.textContent = `Lowest temperature is: ${lowestTemperature}`;
 });
 
@@ -67,7 +66,7 @@ seedBtn.addEventListener("click", (event) => {
       ).toISOString(),
     });
   }
-  weather = sortDates(weather); //Sort weather before generating the table
+  weather = sortWeather(weather, "date"); //Sort weather before generating the table
 
   //To generate table dynamically
   const weatherTable = weather
@@ -81,36 +80,12 @@ seedBtn.addEventListener("click", (event) => {
   thead.innerHTML = "<th>Temperature</th><th>Date</th>";
   tbody.innerHTML = weatherTable;
 
-  const temperatureArray = getTemperatureArray();
-  const dateArray = getDateArray();
-  loadWeatherChart(temperatureArray, dateArray);
+  loadWeatherChart(weather);
 });
 
 // Function to generate randon number between max and min
 generateRandomNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min)) + min;
-};
-
-// Function to generate an array with only temperatures
-getTemperatureArray = () => {
-  let temperatureArray = [];
-  temperatureArray = weather.map((item) => {
-    return parseInt(item.temperature);
-  });
-  return temperatureArray;
-};
-
-// function to store all dates in to a seperate array
-getDateArray = () => {
-  const dateArray = [];
-  weather.forEach((item) => {
-    dateObject = new Date(item.date);
-    let date = dateObject.getDate();
-    let month = dateObject.getMonth() + 1;
-    let year = dateObject.getFullYear();
-    dateArray.push(`${year}-${month}-${date}`);
-  });
-  return dateArray;
 };
 
 // Function to sort temperature array using bubble sort
@@ -165,7 +140,7 @@ submitForm = () => {
     temperature: temperature.value,
     date: new Date(date.value).toISOString(),
   });
-  weather = sortDates(weather);
+  weather = sortWeather(weather, "date");
   const weatherTable = weather
     .map((item) => {
       return `<tr>
@@ -178,11 +153,11 @@ submitForm = () => {
   tbody.innerHTML = weatherTable;
 };
 
-// Function to sort temperature array using bubble sort
-sortDates = (weather) => {
+// Function to sort weather based on sortBy parameter using bubble sort
+sortWeather = (weather, sortBy = "temperature") => {
   for (i = 0; i < weather.length; i++) {
     for (j = 0; j < weather.length - i - 1; j++) {
-      if (weather[j].date > weather[j + 1].date) {
+      if (weather[j][sortBy] > weather[j + 1][sortBy]) {
         let temp = weather[j];
         weather[j] = weather[j + 1];
         weather[j + 1] = temp;
@@ -193,16 +168,29 @@ sortDates = (weather) => {
 };
 
 // function to load weather chart
-loadWeatherChart = (temperatureArray, dateArray) => {
+loadWeatherChart = (weather) => {
+  // Convert date from ISO format to YYYY-MM-DD and create date label for x-axis
+  const dateLabel = weather.map((item) => {
+    dateObject = new Date(item.date);
+    let date = dateObject.getDate();
+    let month = dateObject.getMonth() + 1;
+    let year = dateObject.getFullYear();
+    return `${year}-${month}-${date}`;
+  });
+  // create temperature label for y-axis
+  const temperatureLabel = weather.map((item) => {
+    return item.temperature;
+  });
+
   let myChart = document.querySelector("#myChart").getContext("2d");
-  let lineChart = new Chart(myChart, {
+  new Chart(myChart, {
     type: "line",
     data: {
-      labels: [...dateArray], //  x-axis
+      labels: [...dateLabel], //  x-axis
       datasets: [
         {
           label: "Temperature",
-          data: [...temperatureArray], //  y-axis
+          data: [...temperatureLabel], //  y-axis
           fill: false,
           borderWidth: 1,
           borderColor: "blue",
