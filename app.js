@@ -18,8 +18,6 @@ addRecordBtn.addEventListener("click", (event) => {
   const isFormValid = checkFormValidation(temperature, date);
   if (isFormValid) {
     submitForm();
-    // const temperatureArray = getTemperatureArray();
-    // const dateArray = getDateArray();
     loadWeatherChart(weather);
   }
 });
