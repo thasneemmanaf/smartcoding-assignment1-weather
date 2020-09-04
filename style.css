@@ -136,3 +136,7 @@ table tbody tr:hover {
   padding: 10px 25px;
   width: 400px;
 }
+.visual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
