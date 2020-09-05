@@ -46,7 +46,7 @@ calculateAvgBtn.addEventListener("click", (event) => {
   weather.forEach((item) => {
     sum += parseInt(item.temperature);
   });
-  const avgTemperature = (sum / Object.keys(weather).length).toFixed(2);
+  const avgTemperature = (sum / weather.length).toFixed(2);
   results.textContent = `Average temperature is: ${avgTemperature}`;
 });
 
@@ -84,21 +84,6 @@ seedBtn.addEventListener("click", (event) => {
 // Function to generate randon number between max and min
 generateRandomNumber = (min, max) => {
   return Math.floor(Math.random() * (max - min)) + min;
-};
-
-// Function to sort temperature array using bubble sort
-sortTemperatures = () => {
-  const temperatureArray = getTemperatureArray();
-  for (i = 0; i < temperatureArray.length; i++) {
-    for (j = 0; j < temperatureArray.length - i - 1; j++) {
-      if (temperatureArray[j] > temperatureArray[j + 1]) {
-        let temp = temperatureArray[j];
-        temperatureArray[j] = temperatureArray[j + 1];
-        temperatureArray[j + 1] = temp;
-      }
-    }
-  }
-  return temperatureArray;
 };
 
 // To validate form
